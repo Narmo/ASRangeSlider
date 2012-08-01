@@ -79,7 +79,7 @@ FloatRange FloatRangeMake(float min, float max) {
 	}
 }
 
-- (SliderThumbView *) rightmostThumb {
+- (SliderThumbView *)rightmostThumb {
 	if (self.valueOfSliderThumbOne >= self.valueOfSliderThumbTwo) {
 		return self.thumbOne;
 	}
@@ -107,7 +107,7 @@ FloatRange FloatRangeMake(float min, float max) {
 - (void)setValue:(float)value forThumb:(SliderThumbView *)thumb {
 	float toSet = MIN(self.maximumValue, value);
 	toSet = MAX(self.minimumValue, value);
-	
+
 	if (toSet != [self valueForThumb:thumb]) {
 		float valuePrecentage = (toSet - self.minimumValue) / (self.maximumValue - self.minimumValue);
 		float relativePosition = valuePrecentage * (self.rightmostPointOnTrack - self.leftmostPointOnTrack);
@@ -140,16 +140,23 @@ FloatRange FloatRangeMake(float min, float max) {
 		[super setFrame:aframe];
 		CGRect frame = self.trackBackgroundView.frame;
 		frame.size.width = aframe.size.width - (self.thumbOne.frame.size.width);
+		frame.origin.x = floorf((self.bounds.size.width - frame.size.width) * 0.5f);
+		frame.origin.y = floorf((self.bounds.size.height - frame.size.height) * 0.5f);
 		self.trackBackgroundView.frame = frame;
-		self.trackBackgroundView.center = centerOfBounds(self);
-		self.activeAreaView.center = centerOfBounds(self);
 		
+		frame = self.activeAreaView.frame;
+		frame.origin.x = floorf((self.bounds.size.width - frame.size.width) * 0.5f);
+		frame.origin.y = floorf((self.bounds.size.height - frame.size.height) * 0.5f);
+		self.activeAreaView.frame = frame;
+
 		CGPoint thumbCenter = self.thumbOne.center;
-		thumbCenter.y = centerOfBounds(self).y;
+		thumbCenter.y = self.bounds.size.height * 0.5f;
 		self.thumbOne.center = thumbCenter;
+		self.thumbOne.frame = CGRectIntegral(self.thumbOne.frame);
 
 		thumbCenter.x = self.thumbTwo.center.x;
 		self.thumbTwo.center = thumbCenter;
+		self.thumbTwo.frame = CGRectIntegral(self.thumbTwo.frame);
 		
 		self.value = valueNow;
 	}
@@ -161,8 +168,8 @@ FloatRange FloatRangeMake(float min, float max) {
     if ((self = [super init]) != nil) {
 		self.spectrum = aSpectrum;
 		
-		self.trackBackgroundView = [[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"rangeslider-default"] stretchableImageWithLeftCapWidth:5 topCapHeight:0]];
-		self.activeAreaView = [[UIImageView alloc] initWithFrame:self.trackBackgroundView.frame];
+		self.trackBackgroundView = [[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"rangeslider-default"] stretchableImageWithLeftCapWidth:6 topCapHeight:0]];
+		self.activeAreaView = [[UIImageView alloc] initWithFrame:_trackBackgroundView.frame];
 		self.thumbOne = [[SliderThumbView alloc] init];
 		self.thumbTwo = [[SliderThumbView alloc] init];
 		
@@ -171,19 +178,26 @@ FloatRange FloatRangeMake(float min, float max) {
 		[self addSubview:_trackBackgroundView];
 		CGRect frame;
 		frame.origin = CGPointZero;
-		frame.size = self.trackBackgroundView.frame.size;
+		frame.size = _trackBackgroundView.frame.size;
 		frame.size.width += self.rightmostThumb.frame.size.width;
 		self.frame = frame;
 
-		self.activeAreaView.backgroundColor = RGBA(93, 177, 255, 0.5f);
+		_activeAreaView.backgroundColor = RGBA(93, 177, 255, 0.5f);
 		[self addSubview:_activeAreaView];
-		self.activeAreaView.center = centerOfBounds(self.trackBackgroundView);
 		
+		frame = _activeAreaView.frame;
+		frame.origin.x = floorf((_trackBackgroundView.bounds.size.width - frame.size.width) * 0.5f);
+		frame.origin.y = floorf((_trackBackgroundView.bounds.size.height - frame.size.height) * 0.5f);
+		_activeAreaView.frame = frame;
+
+
 		[self addSubview:_thumbOne];
 		self.thumbOne.center = CGPointMake(self.thumbOne.frame.size.width * 0.5f, self.frame.size.height * 0.5f);
+		self.thumbOne.frame = CGRectIntegral(self.thumbOne.frame);
 		
 		[self addSubview:_thumbTwo];
 		self.thumbTwo.center = CGPointMake(self.frame.size.width - self.thumbTwo.frame.size.width * 0.5f, self.frame.size.height * 0.5f);
+		self.thumbTwo.frame = CGRectIntegral(self.thumbTwo.frame);
 
 		self.value = FloatRangeMake(self.minimumValue, self.maximumValue);
     }
@@ -219,7 +233,12 @@ FloatRange FloatRangeMake(float min, float max) {
 }
 
 - (void)updateSubviews {
-	self.activeAreaView.frame = CGRectMake(self.rightmostThumb.center.x, self.activeAreaView.frame.origin.y, self.leftmostThumb.center.x - self.rightmostThumb.center.x, self.activeAreaView.frame.size.height);
+	self.activeAreaView.frame = CGRectMake(
+										   floorf(self.rightmostThumb.center.x),
+										   floorf(_activeAreaView.frame.origin.y),
+										   floorf(self.leftmostThumb.center.x - self.rightmostThumb.center.x),
+										   floorf(self.activeAreaView.frame.size.height)
+										   );
 }
 
 - (void)setTrackBackgroundImage:(UIImage *)image {

@@ -7,10 +7,6 @@
 
 #import <UIKit/UIKit.h>
 
-static inline CGPoint centerOfBounds(UIView *view) {
-	return CGPointMake((view.bounds.size.width - view.bounds.origin.x) * 0.5f, (view.bounds.size.height - view.bounds.origin.y) * 0.5f);
-}
-
 @interface SliderThumbView : UIView
 
 @property (nonatomic, readonly, strong) UIImageView *backgroundView;

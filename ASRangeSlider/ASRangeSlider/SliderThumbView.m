@@ -27,7 +27,6 @@
 		textLabel.adjustsFontSizeToFitWidth = YES;
 		textLabel.textAlignment = UITextAlignmentCenter;
 		[self addSubview:textLabel];
-		textLabel.center = centerOfBounds(self);
 		self.textLabel = textLabel;
 	}
     return self;
@@ -40,16 +39,22 @@
 
 - (void)setBackgroundImage:(UIImage *)image {
 	UIImageView *newOne = [[UIImageView alloc] initWithImage:image];
+
 	CGPoint center = self.center;
 	self.frame = newOne.frame;
 	self.center = center;
+	self.frame = CGRectIntegral(self.frame);
 	[self.backgroundView removeFromSuperview];
 	self.backgroundView = newOne;
 	
 	[self addSubview:self.backgroundView];
-	self.backgroundView.center = centerOfBounds(self);
-	self.textLabel.frame = self.backgroundView.frame;
-	self.textLabel.center = centerOfBounds(self);
+
+	
+	CGRect frame = self.backgroundView.frame;
+	frame.origin.x = floorf((self.bounds.size.width - frame.size.width) * 0.5f);
+	frame.origin.y = floorf((self.bounds.size.height - frame.size.height) * 0.5f);
+	self.backgroundView.frame = frame;
+	self.textLabel.frame = frame;
 	[self bringSubviewToFront:self.textLabel];
 }
 
