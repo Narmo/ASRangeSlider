@@ -3,19 +3,13 @@
 //  ASRangeSlider
 //
 //  Created by Avraham Shukron on 6/9/11.
-// .
 //
-
-#import <UIKit/UIKit.h>
 
 @class ASRangeSliderViewController;
 
-@interface ASRangeSliderAppDelegate : NSObject <UIApplicationDelegate> {
+@interface ASRangeSliderAppDelegate : UIResponder <UIApplicationDelegate>
 
-}
-
-@property (nonatomic, retain) IBOutlet UIWindow *window;
-
-@property (nonatomic, retain) IBOutlet ASRangeSliderViewController *viewController;
+@property (nonatomic, strong) ASRangeSliderViewController *viewController;
+@property (nonatomic, strong) UIWindow *window;
 
 @end
